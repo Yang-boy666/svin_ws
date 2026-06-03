@@ -1,0 +1,66 @@
+# config_my_svin_gv7.yaml
+# Generated from zy camchain-imucam.yaml, imu yaml, aprilgrid.yaml
+# GV7 style for SVIN, ready for launch
+
+svin:
+  use_imu: true
+  use_camera0: true
+  use_camera1: true
+  output_trajectory_topic: /svin/trajectory
+  output_pose_topic: /svin/pose
+
+camera0:
+  frame_id: zed2i_left_link
+  camera_model: pinhole
+  width: 960
+  height: 540
+  rate: 30
+  intrinsics: [536.92478647, 536.71794122, 475.92990858, 273.64665111]
+  distortion_model: radtan
+  distortion_coeffs: [-0.07677801, 0.07833428, -0.00082207, -0.00145918]
+  topic: /zed/zed_node/left/color/raw/image
+  timeshift_to_imu: 0.0622723986
+
+camera1:
+  frame_id: zed2i_right_link
+  camera_model: pinhole
+  width: 960
+  height: 540
+  rate: 30
+  intrinsics: [533.54781979, 533.58877293, 475.80628586, 263.01053745]
+  distortion_model: radtan
+  distortion_coeffs: [-0.07252468, 0.06323979, -0.00169285, 0.00026751]
+  topic: /zed/zed_node/right/color/raw/image
+  timeshift_to_imu: 0.0622692357
+
+imu0:
+  frame_id: mfosn_imu_link
+  update_rate: 200
+  acc_noise_density: 0.00033848678
+  gyro_noise_density: 4.67344295e-05
+  acc_random_walk: 6.02607345e-05
+  gyro_random_walk: 3.11311286e-06
+  topic: /imu_mFOSN
+  T_imu_to_body:
+    translation: [0.0, 0.0, 0.0]
+    rotation: [0.0, 0.0, 0.0, 1.0]
+
+extrinsics:
+  cam0_to_imu0:
+    translation: [0.03105675, 0.00790172, 0.00883385]  
+    rotation: [0.706923, -0.014803, 0.707297, 0.014852]  
+  cam1_to_imu0:
+    translation: [0.0326433, 0.00475441, 0.12775811]  
+    rotation: [0.707005, 0.017336, 0.706885, 0.013744]  
+
+aprilgrid:
+  use_for_initialization: true
+  frame_id: aprilgrid_link
+  tag_rows: 6
+  tag_cols: 6
+  tag_size: 0.0207
+  tag_spacing: 0.00621
+
+output:
+  pose_topic: /svin/pose
+  trajectory_topic: /svin/trajectory

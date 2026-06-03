@@ -1,0 +1,34 @@
+# ===== Colcon build/install artifacts =====
+build/
+install/
+log/
+
+# ===== Large rosbag datasets =====
+date_record/
+
+# ===== Original zip download =====
+src/SVIn-main.zip
+
+# ===== Runtime outputs (生成的轨迹/点云) =====
+src/SVIn/pose_graph/svin_results/
+src/SVIn/pose_graph/reconstruction_results/
+src/SVIn/pose_graph/debug_output/
+
+# ===== IDE / Editor =====
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ===== Python =====
+__pycache__/
+*.pyc
+*.egg-info/
+
+# ===== Claude Code =====
+.claude/
+
+# ===== System =====
+.DS_Store
+Thumbs.db
