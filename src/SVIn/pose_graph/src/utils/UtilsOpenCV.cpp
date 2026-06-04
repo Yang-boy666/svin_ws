@@ -296,10 +296,24 @@ cv::Mat UtilsOpenCV::readRosImage(const sensor_msgs::msg::Image::ConstSharedPtr 
       cv::cvtColor(img_const, converted_img, cv::COLOR_RGB2BGR);
     }
     return converted_img;
+  } else if (img_msg->encoding == sensor_msgs::image_encodings::BGRA8) {
+    if (grayscale) {
+      cv::cvtColor(img_const, converted_img, cv::COLOR_BGRA2GRAY);
+    } else {
+      cv::cvtColor(img_const, converted_img, cv::COLOR_BGRA2BGR);
+    }
+    return converted_img;
+  } else if (img_msg->encoding == sensor_msgs::image_encodings::RGBA8) {
+    if (grayscale) {
+      cv::cvtColor(img_const, converted_img, cv::COLOR_RGBA2GRAY);
+    } else {
+      cv::cvtColor(img_const, converted_img, cv::COLOR_RGBA2BGR);
+    }
+    return converted_img;
   } else {
     LOG_IF(ERROR, cv_ptr->encoding != sensor_msgs::image_encodings::MONO8)
-        << "Expected image with MONO8, BGR8, or RGB8 encoding."
-           "Add in here more conversions if you wish.";
+        << "Expected image with MONO8, BGR8, RGB8, BGRA8, or RGBA8 encoding."
+           " Add in here more conversions if you wish.";
     return img_const;
   }
 }

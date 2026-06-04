@@ -306,17 +306,21 @@ const cv::Mat Subscriber::readRosImage(const sensor_msgs::msg::Image::ConstShare
   const cv::Mat img_const = cv_ptr->image;  // Don't modify shared image in ROS.
   cv::Mat converted_img(img_const.size(), CV_8U);
   if (img_msg->encoding == sensor_msgs::image_encodings::BGR8) {
-    // LOG_EVERY_N(WARNING, 10) << "Converting image...";
     cv::cvtColor(img_const, converted_img, cv::COLOR_BGR2GRAY);
     return converted_img;
   } else if (img_msg->encoding == sensor_msgs::image_encodings::RGB8) {
-    // LOG_EVERY_N(WARNING, 10) << "Converting image...";
     cv::cvtColor(img_const, converted_img, cv::COLOR_RGB2GRAY);
+    return converted_img;
+  } else if (img_msg->encoding == sensor_msgs::image_encodings::BGRA8) {
+    cv::cvtColor(img_const, converted_img, cv::COLOR_BGRA2GRAY);
+    return converted_img;
+  } else if (img_msg->encoding == sensor_msgs::image_encodings::RGBA8) {
+    cv::cvtColor(img_const, converted_img, cv::COLOR_RGBA2GRAY);
     return converted_img;
   } else {
     CHECK_EQ(cv_ptr->encoding, sensor_msgs::image_encodings::MONO8)
-        << "Expected image with MONO8, BGR8, or RGB8 encoding."
-           "Add in here more conversions if you wish.";
+        << "Expected image with MONO8, BGR8, RGB8, BGRA8, or RGBA8 encoding."
+           " Add in here more conversions if you wish.";
     return img_const;
   }
 }

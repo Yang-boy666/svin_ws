@@ -1,0 +1,144 @@
+%YAML:1.0
+# ============================================================
+# SVIn 配置文件：ZED2i 双目 + mFOSN 光纤IMU
+# 基于 Kalibr 标定输出 (20260528)
+# 覆盖 config_zy.yaml
+# ============================================================
+
+cameras:
+    # ---- 左目 (cam0) ----
+    # 注意: Kalibr 输出的是 T_cam_imu (IMU→Camera), SVIn 需要 T_SC (Camera→IMU)
+    # 已取逆: T_SC = inv(T_cam_imu)
+    - {T_SC:
+       [ -0.0959880544197152, 0.0604656487914259, 0.9935442610799738, 0.1958076279879809,
+         -0.9952484298380899, -0.0222113286912857, -0.0948009482156475, -0.0266788237001528,
+         0.0163357373122863, -0.9979231243908526, 0.0623103642459613, 0.0006784779331020,
+         0.0, 0.0, 0.0, 1.0],
+       image_dimension: [960, 540],
+       distortion_coefficients: [-0.004496482189876858, 0.03941710083284325, -0.010454021767328464, 0.018905909560654927],
+       distortion_type: radialtangential,
+       focal_length: [665.519936355672, 670.5996982736883],
+       principal_point: [550.103653040403, 219.1813358661758]}
+
+    # ---- 右目 (cam1) ----
+    # 注意: Kalibr 输出的是 T_cam_imu (IMU→Camera), SVIn 需要 T_SC (Camera→IMU)
+    # 已取逆: T_SC = inv(T_cam_imu)
+    - {T_SC:
+       [ -0.0024280857197354, 0.0617230475951386, 0.9980903615381258, 0.1900058781407902,
+         -0.9998400513019456, -0.0178354863561137, -0.0013293754037462, -0.1453924165361755,
+         0.0177193739240647, -0.9979339461216907, 0.0617564811637616, 0.0029992216869166,
+         0.0, 0.0, 0.0, 1.0],
+       image_dimension: [960, 540],
+       distortion_coefficients: [-0.029764690153728502, 0.11465525532486893, -0.01136891030817515, 0.0037095437110295183],
+       distortion_type: radialtangential,
+       focal_length: [670.7799242464038, 674.8694477668699],
+       principal_point: [493.5793307185427, 206.47319764155404]}
+
+camera_params:
+    camera_rate: 30
+    sigma_absolute_translation: 0.0
+    sigma_absolute_orientation: 0.0
+    sigma_c_relative_translation: 0.0
+    sigma_c_relative_orientation: 0.0
+
+imu_params:
+    a_max: 176.0
+    g_max: 7.8
+    sigma_g_c: 0.0002        # 陀螺噪声密度 [rad/s/sqrt(Hz)] (适度放宽)
+    sigma_a_c: 0.005         # 加速度计噪声密度 [m/s^2/sqrt(Hz)] (大幅放宽，降低IMU权重)
+    sigma_bg: 0.001          # 陀螺 bias 先验 [rad/s] (适度放宽)
+    sigma_ba: 0.5            # 加速度计 bias 先验 [m/s^2] (大幅放宽以适应小幅度运动)
+    sigma_gw_c: 0.00001      # 陀螺随机游走 [rad/s^s/sqrt(Hz)]
+    sigma_aw_c: 0.0001       # 加速度计随机游走 [m/s^2/sqrt(Hz)]
+    tau: 3600.0
+    g: 9.81007
+    a0: [ 0.0, 0.0, 0.0 ]
+    imu_rate: 200
+    # IMU → Body 外参 (Kalibr: T_i_b = identity, IMU=Body)
+    T_BS:
+        [1.0000, 0.0000, 0.0000, 0.0000,
+         0.0000, 1.0000, 0.0000, 0.0000,
+         0.0000, 0.0000, 1.0000, 0.0000,
+         0.0000, 0.0000, 0.0000, 1.0000]
+
+# 声纳/深度（陆地导航不启用）
+sonar_params:
+    T_SSo:
+        [1.0000, 0.0000, 0.0000, 0.0000,
+         0.0000, 1.0000, 0.0000, 0.0000,
+         0.0000, 0.0000, 1.0000, 0.0000,
+         0.0000, 0.0000, 0.0000, 1.0000]
+
+# 估计器参数
+numKeyframes: 7             # 增加关键帧窗口 (原 5)
+numImuFrames: 5             # 增加IMU帧窗口 (原 3)
+
+# Ceres 优化
+ceres_options:
+    minIterations: 5
+    maxIterations: 15
+    timeLimit: 0.05
+
+# BRISK 特征检测
+detection_options:
+    threshold: 10.0        # 降低阈值以检测更多特征点 (原 20.0)
+    octaves: 1
+    maxNoKeypoints: 600     # 增加最大特征点数 (原 400)
+
+# 图像延迟 [s]（Kalibr timeshift_cam_imu ≈ -0.09s, 相机领先IMU）
+# 测试先设为 0，观察是否改善速度漂移
+imageDelay: 0.0
+
+# 调试显示
+displayImages: false
+publishDebugImages: false
+useDriver: false
+
+# 发布选项
+publishing_options:
+    publish_rate: 100
+    publishLandmarks: true
+    landmarkQualityThreshold: 1.0e-2
+    maximumLandmarkQuality: 0.05
+    maxPathLength: 20
+    publishImuPropagatedState: false   # 只发布优化后的速度，避免IMU传播累积误差
+    T_Wc_W:
+        [1.0000, 0.0000, 0.0000, 0.0000,
+         0.0000, 1.0000, 0.0000, 0.0000,
+         0.0000, 0.0000, 1.0000, 0.0000,
+         0.0000, 0.0000, 0.0000, 1.0000]
+    trackedBodyFrame: B
+    velocitiesFrame: Wc
+
+# 声纳/深度开关
+isSonarUsed: false
+isDepthUsed: false
+histogramMethod: "CLAHE"
+claheClipLimit: 1.0
+claheTilesGridSize: 2
+resizeFactor: 1.0          # ZED 960x540 原始分辨率已经合适，不缩放
+
+# 回环检测参数
+loop_closure_params:
+    enable: 1
+    min_correspondences: 25
+    pnp_reprojection_threshold: 20.0
+    pnp_ransac_iterations: 100
+    keyframe_queue: 10
+    max_yaw_diff: 30.0
+    max_position_diff: 6.0
+
+health:
+    enable: 1               # 启用健康监测和跟踪恢复
+    min_keypoints: 15
+    consecutive_keyframes: 3
+    keyframe_wait_time: 2.0
+    kps_per_quadrant: 1
+
+global_map_params:
+    enable: 1
+    min_landmark_quality: 0.01
+
+output_params:
+    debug: 0
+    output_dir: ~/svin_ws/src/SVIn/pose_graph
