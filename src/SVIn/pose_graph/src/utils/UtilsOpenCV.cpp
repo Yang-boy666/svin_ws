@@ -313,7 +313,7 @@ cv::Mat UtilsOpenCV::readRosImage(const sensor_msgs::msg::Image::ConstSharedPtr 
   } else {
     LOG_IF(ERROR, cv_ptr->encoding != sensor_msgs::image_encodings::MONO8)
         << "Expected image with MONO8, BGR8, RGB8, BGRA8, or RGBA8 encoding."
-           " Add in here more conversions if you wish.";
+           "Add in here more conversions if you wish.";
     return img_const;
   }
 }

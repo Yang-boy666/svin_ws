@@ -38,8 +38,8 @@ sudo apt install ros-jazzy-pcl-ros ros-jazzy-tf2-sensor-msgs ros-jazzy-compresse
 Install brisk features
 
 ```bash
-wget https://github.com/18r441m/ethzasl_brisk
-unzip ethzasl_brisk-2.0.8.zip
+wget https://www.doc.ic.ac.uk/~sleutene/software/brisk-2.0.8.zip
+unzip brisk-2.0.8.zip
 cd brisk
 mkdir build
 cd build

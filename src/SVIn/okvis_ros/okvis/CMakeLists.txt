@@ -10,7 +10,7 @@ set(OKVIS_VERSION
 
 # options for build configuration
 option(USE_SYSTEM_BRISK
-        "Use brisk via find_package rather than downloading it as part of okvis" ON)
+        "Use brisk via find_package rather than downloading it as part of okvis" OFF)
 option(USE_SYSTEM_CERES
         "Use ceres via find_package rather than downloading it as part of okvis" ON)
 option(BUILD_APPS
@@ -54,11 +54,11 @@ else ()
     message(STATUS "Building with build type '${CMAKE_BUILD_TYPE}'")
 endif ()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -std=c++17 -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wall -std=c++20 -fPIC")
 
 if (${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "arm*")
     message(STATUS "ARM processor detected, will attempt to use NEON.")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=neon")
 else ()
     message(STATUS "Assuming SSE instructions available.")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mssse3")
@@ -89,7 +89,7 @@ if (${USE_SYSTEM_BRISK})
     message(STATUS "Using system brisk. Found at ${BRISK_INCLUDE_DIRS}.")
 else ()
     ExternalProject_Add(brisk_external
-            URL "https://github.com/18r441m/ethzasl_brisk.git"
+            URL "https://www.doc.ic.ac.uk/~sleutene/software/brisk-2.0.8.zip"
             INSTALL_DIR ${CMAKE_BINARY_DIR}
             CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
             PREFIX ${CMAKE_CURRENT_BINARY_DIR}/brisk

@@ -51,8 +51,8 @@ set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(okvis)
 
 
-add_definitions(-fPIC -O3 -Wextra -Winit-self -Woverloaded-virtual
-        -Wnon-virtual-dtor -Wsign-promo -Wno-long-long -std=c++17)
+add_definitions(-fPIC -march=native -O3 -Wextra -Winit-self -Woverloaded-virtual
+        -Wnon-virtual-dtor -Wsign-promo -Wno-long-long -std=c++20)
 
 list(APPEND ament_libraries
         rclcpp

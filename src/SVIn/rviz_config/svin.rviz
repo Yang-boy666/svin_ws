@@ -154,7 +154,7 @@ Visualization Manager:
       Length: 0.5
       Name: Axes
       Radius: 0.05000000074505806
-      Reference Frame: world
+      Reference Frame: cam1
       Value: true
     - Class: rviz_default_plugins/Image
       Enabled: true
