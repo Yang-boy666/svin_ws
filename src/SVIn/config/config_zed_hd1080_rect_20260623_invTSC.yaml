@@ -1,0 +1,135 @@
+%YAML:1.0
+
+# Config file for 20260623 ZED HD1080 rectified stereo + built-in IMU.
+# Source: /home/zhuchao/datebase/小车数据集20260623/zedHD1080外参.txt
+# Image topics:
+#   /zed/zed_node/left/color/rect/image
+#   /zed/zed_node/right/color/rect/image
+# IMU topic:
+#   /zed/zed_node/imu/data_raw
+#
+# The camera_info topics are rectified, so distortion is set to zero.
+# Correct 20260623 ZED HD1080 config for SVIn.
+# This file uses inverse T_SC compared with config_zed_hd1080_rect_20260623.yaml.
+# In SVIn/OKVIS, T_SC is used as camera -> sensor/IMU in T_WC = T_WS * T_SC.
+# The previous 20260623 file used the TF-like sensor/IMU -> camera(optical)
+# direction, which made the pose_graph red camera frustum stand upright.
+# RViz check on 2026-06-23: this invTSC version shows the red camera frustum
+# in the correct horizontal orientation.
+# The right camera baseline is derived from P[3] / fx:
+# 128.68292236328125 / 1075.2408447265625 = 0.11967823115574239 m.
+
+cameras:
+    # Left rectified camera (cam0)
+    - {T_SC:
+       [ 0.0072196493058488,  0.0090953580666430,  0.9999325732998674,  0.0018353465897705,
+        -0.9999245199173570, -0.0098755700710446,  0.0073094190483545,  0.0230717368668918,
+         0.0099413859674150, -0.9999098697407117,  0.0090233734066281, -0.0004281920350218,
+         0.0, 0.0, 0.0, 1.0],
+       image_dimension: [1920, 1080],
+       distortion_coefficients: [0.0, 0.0, 0.0, 0.0],
+       distortion_type: radialtangential,
+       focal_length: [1076.0477294921875, 1076.0477294921875],
+       principal_point: [959.1385498046875, 539.5226440429688]}
+
+    # Right rectified camera (cam1)
+    - {T_SC:
+       [ 0.0072196493058488,  0.0090953580666430,  0.9999325732998674,  0.0026993814482593,
+        -0.9999245199173570, -0.0098755700710446,  0.0073094190483545, -0.0965974609660724,
+         0.0099413859674150, -0.9999098697407117,  0.0090233734066281,  0.0007615754527950,
+         0.0, 0.0, 0.0, 1.0],
+       image_dimension: [1920, 1080],
+       distortion_coefficients: [0.0, 0.0, 0.0, 0.0],
+       distortion_type: radialtangential,
+       focal_length: [1075.2408447265625, 1075.2408447265625],
+       principal_point: [959.1388549804688, 539.5243530273438]}
+
+camera_params:
+    camera_rate: 14
+    sigma_absolute_translation: 0.0
+    sigma_absolute_orientation: 0.0
+    sigma_c_relative_translation: 0.0
+    sigma_c_relative_orientation: 0.0
+
+imu_params:
+    a_max: 176.0
+    g_max: 7.8
+    sigma_g_c: 0.00011001353825871552
+    sigma_a_c: 0.0017503490634546263
+    sigma_bg: 0.03
+    sigma_ba: 0.1
+    sigma_gw_c: 9.332310748254951e-06
+    sigma_aw_c: 0.0002495921976055482
+    tau: 3600.0
+    g: 9.807
+    a0: [ 0.0, 0.0, 0.0 ]
+    imu_rate: 200
+    T_BS:
+        [1.0000, 0.0000, 0.0000, 0.0,
+         0.0000, 1.0000, 0.0000, 0.0,
+         0.0000, 0.0000, 1.0000, 0.0,
+         0.0000, 0.0000, 0.0000, 1.0000]
+
+# Estimator parameters
+numKeyframes: 5
+numImuFrames: 3
+
+ceres_options:
+    minIterations: 3
+    maxIterations: 10
+    timeLimit: 0.035
+
+detection_options:
+    threshold: 30.0
+    octaves: 1
+    maxNoKeypoints: 400
+
+imageDelay: 0.0
+
+displayImages: false
+publishDebugImages: false
+useDriver: false
+
+publishing_options:
+    publish_rate: 100
+    publishLandmarks: true
+    landmarkQualityThreshold: 1.0e-2
+    maximumLandmarkQuality: 0.05
+    maxPathLength: 20
+    publishImuPropagatedState: false
+    T_Wc_W:
+        [1.0000, 0.0000, 0.0000, 0.0000,
+         0.0000, 1.0000, 0.0000, 0.0000,
+         0.0000, 0.0000, 1.0000, 0.0000,
+         0.0000, 0.0000, 0.0000, 1.0000]
+    trackedBodyFrame: B
+    velocitiesFrame: Wc
+
+isSonarUsed: false
+isDepthUsed: false
+histogramMethod: "NONE"
+resizeFactor: 0.5
+
+loop_closure_params:
+    enable: 1
+    min_correspondences: 20
+    pnp_reprojection_threshold: 25.0
+    pnp_ransac_iterations: 100
+    keyframe_queue: 10
+    max_yaw_diff: 30.0
+    max_position_diff: 6.0
+
+health:
+    enable: 0
+    min_keypoints: 15
+    consecutive_keyframes: 3
+    keyframe_wait_time: 2.0
+    kps_per_quadrant: 1
+
+global_map_params:
+    enable: 1
+    min_landmark_quality: 0.01
+
+output_params:
+  debug: 0
+  output_dir: ~/svin_ws/src/SVIn/pose_graph

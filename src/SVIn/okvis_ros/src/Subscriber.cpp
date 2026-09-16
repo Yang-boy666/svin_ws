@@ -292,11 +292,17 @@ const cv::Mat Subscriber::readRosImage(const sensor_msgs::msg::Image::ConstShare
   try {
     // TODO(Toni): here we should consider using toCvShare...
     cv_ptr = cv_bridge::toCvCopy(img_msg);
-    RCLCPP_INFO(node_->get_logger(), "Received image - encoding: %s, width: %d, height: %d, size: %zu",
-                img_msg->encoding.c_str(),
-                img_msg->width,
-                img_msg->height,
-                img_msg->data.size());
+    // Original per-frame INFO log kept for rollback/reference:
+    // RCLCPP_INFO(node_->get_logger(), "Received image - encoding: %s, width: %d, height: %d, size: %zu",
+    //             img_msg->encoding.c_str(),
+    //             img_msg->width,
+    //             img_msg->height,
+    //             img_msg->data.size());
+    RCLCPP_INFO_ONCE(node_->get_logger(), "Received image - encoding: %s, width: %d, height: %d, size: %zu",
+                     img_msg->encoding.c_str(),
+                     img_msg->width,
+                     img_msg->height,
+                     img_msg->data.size());
   } catch (cv_bridge::Exception& exception) {
     RCLCPP_FATAL(node_->get_logger(), "cv_bridge exception: %s", exception.what());
     rclcpp::shutdown();
@@ -313,10 +319,19 @@ const cv::Mat Subscriber::readRosImage(const sensor_msgs::msg::Image::ConstShare
     // LOG_EVERY_N(WARNING, 10) << "Converting image...";
     cv::cvtColor(img_const, converted_img, cv::COLOR_RGB2GRAY);
     return converted_img;
+  // 原代码：这里只允许 MONO8/BGR8/RGB8，遇到 ZED bag 中的 bgra8 会触发 CHECK 崩溃。
+  // } else {
+  //   CHECK_EQ(cv_ptr->encoding, sensor_msgs::image_encodings::MONO8)
+  //       << "Expected image with MONO8, BGR8, or RGB8 encoding."
+  //          "Add in here more conversions if you wish.";
+  //   return img_const;
+  // }
   } else if (img_msg->encoding == sensor_msgs::image_encodings::BGRA8) {
+    // 改进原因：20260528 ZED 数据集发布 bgra8 图像，SVIn 前端需要灰度图，因此在这里显式转灰度。
     cv::cvtColor(img_const, converted_img, cv::COLOR_BGRA2GRAY);
     return converted_img;
   } else if (img_msg->encoding == sensor_msgs::image_encodings::RGBA8) {
+    // 改进原因：兼容同类四通道 RGBA 图像，避免后续遇到 rgba8 时再次崩溃。
     cv::cvtColor(img_const, converted_img, cv::COLOR_RGBA2GRAY);
     return converted_img;
   } else {

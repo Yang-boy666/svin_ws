@@ -1,0 +1,30 @@
+%YAML:1.0
+
+# ZED stereo camera calibration for pose_graph
+# Model: pinhole + radtan, 960x540, resizeFactor: 0.5
+
+model_type: PINHOLE
+camera_name: left
+
+# image resize factor, MUST be same as OKVIS config file
+resizeFactor: 0.5
+
+# optimization parameters
+max_solver_time: 0.04
+max_num_iterations: 8
+keyframe_parallax: 10.0
+
+# loop closure parameters
+loop_closure: 1
+fast_relocalization: 1
+min_loop_num: 35
+ransac_reproj_threshold: 10.0
+
+# original image dimensions
+image_height: 540
+image_width: 960
+
+# original camera intrinsics (will be resized by resizeFactor)
+focal_length: [531.5854839119636, 531.9418899745004]
+principal_point: [477.43031320611044, 275.00638542423246]
+distortion_coefficients: [-0.077404466277624, 0.040551337333836146, 0.0005165250520759718, 0.0013548665795142423]

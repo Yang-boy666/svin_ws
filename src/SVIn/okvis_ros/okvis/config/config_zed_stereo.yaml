@@ -1,0 +1,98 @@
+%YAML:1.0
+cameras:
+    - {T_SC:
+       [ 0.01216599, -0.01404103,  0.9998274,   0.08666391,
+        -0.9998429,   0.01271965,  0.0123448,  -0.0988754,
+        -0.01289079, -0.99982051, -0.01388407,  0.05677517,
+          0.0, 0.0, 0.0, 1.0],
+       image_dimension: [960, 540],
+       distortion_coefficients: [-0.077404466277624, 0.040551337333836146, 0.0005165250520759718, 0.0013548665795142423],
+       distortion_type: radialtangential,
+       focal_length: [531.5854839119636, 531.9418899745004],
+       principal_point: [477.43031320611044, 275.00638542423246]}
+    - {T_SC:
+       [ 0.01865616, -0.02217928,  0.99957993,  0.08822507,
+        -0.99978704,  0.00840747,  0.01884658, -0.21820348,
+        -0.00882194, -0.99971866, -0.02201771,  0.05536671,
+          0.0, 0.0, 0.0, 1.0],
+       image_dimension: [960, 540],
+       distortion_coefficients: [-0.07489648165922076, 0.04147470852691014, -0.00010289937864839974, 7.1187513835112e-05],
+       distortion_type: radialtangential,
+       focal_length: [530.6744751405682, 531.1048065844222],
+       principal_point: [480.20493000506843, 267.86147668501604]}
+
+camera_params:
+    camera_rate: 20
+    sigma_absolute_translation: 0.0
+    sigma_absolute_orientation: 0.0
+    sigma_c_relative_translation: 0.0 # below 1.0e-6 ruines numerics...
+    sigma_c_relative_orientation: 0.0 # below 1.0e-6 ruines numerics...
+
+imu_params:
+    a_max: 176.0 # acceleration saturation [m/s^2]
+    g_max: 7.8 # gyro saturation [rad/s]
+    sigma_g_c: 0.00017630374332390088 # gyro noise density [rad/s/sqrt(Hz)]
+    sigma_a_c: 0.0012943427263198248  # accelerometer noise density [m/s^2/sqrt(Hz)]
+    sigma_bg: 0.03 # gyro bias prior [rad/s]
+    sigma_ba: 0.1 # accelerometer bias prior [m/s^2]
+    sigma_gw_c: 4.8453452642470325e-05 # gyro drift noise density [rad/s^s/sqrt(Hz)]
+    sigma_aw_c: 0.00015022616332559084 # accelerometer drift noise density [m/s^2/sqrt(Hz)]
+    tau: 3600.0 # reversion time constant, currently not in use [s]
+    g: 9.807 # Earth's acceleration due to gravity [m/s^2] (from kalibr calibration)
+    a0: [ 0.0, 0.0, 0.0 ] # Accelerometer bias [m/s^2]
+    imu_rate: 100
+    # tranform Body-Sensor (IMU)
+    T_BS:
+        [1.0000, 0.0000, 0.0000, 0.0,
+         0.0000, 1.0000, 0.0000, 0.0,
+         0.0000, 0.0000, 1.0000, 0.0,
+         0.0000, 0.0000, 0.0000, 1.0000]
+
+# Estimator parameters
+numKeyframes: 5 # number of keyframes in optimisation window
+numImuFrames: 3 # number of frames linked by most recent nonlinear IMU error terms
+
+# ceres optimization options
+ceres_options:
+    minIterations: 3   # minimum number of iterations always performed
+    maxIterations: 10  # never do more than these, even if not converged
+    timeLimit: 0.035   # [s] negative values will set the an unlimited time limit
+
+# detection
+detection_options:
+    threshold: 40.0      # detection threshold. By default the uniformity radius in pixels
+    octaves: 0           # number of octaves for detection. 0 means single-scale at highest resolution
+    maxNoKeypoints: 400  # restrict to a maximum of this many keypoints per image (strongest ones)
+
+# delay of images [s]:
+imageDelay: 0.0  # in case you are using a custom setup, you will have to calibrate this. 0 for the VISensor.
+
+# display debug images?
+displayImages: true  # displays debug video and keyframe matches. May be slow.
+publishDebugImages: false  # publish debug image to topic ~debug_image_x
+
+# use direct driver
+useDriver: false
+
+# some options for how and what to publish -- optional in ROS-free version
+publishing_options:
+    publish_rate: 100                  # rate at which odometry updates are published only works properly if imu_rate/publish_rate is an integer!!
+    publishLandmarks: true             # select, if you want to publish landmarks at all
+    landmarkQualityThreshold: 1.0e-2   # landmark with lower quality will not be published
+    maximumLandmarkQuality: 0.05       # landmark with higher quality will be published with the maximum colour intensity
+    maxPathLength: 20                  # maximum length of the published path
+    publishImuPropagatedState: false    # Should the state that is propagated with IMU messages be published? Or just the optimized ones?
+    # provide custom World frame Wc
+    T_Wc_W:
+        [1.0000, 0.0000, 0.0000, 0.0000,
+         0.0000, 1.0000, 0.0000, 0.0000,
+         0.0000, 0.0000, 1.0000, 0.0000,
+         0.0000, 0.0000, 0.0000, 1.0000]
+    trackedBodyFrame: B                # B or S, the frame of reference that will be expressed relative to the selected worldFrame
+    velocitiesFrame: Wc                # Wc, B or S,  the frames in which the velocities of the selected trackedBodyFrame will be expressed in
+
+isSonarUsed: false
+isDepthUsed: false
+isRelocalization: true
+histogramMethod: "NONE" # NONE, HISTOGRAM, CLAHE
+resizeFactor: 0.5  # by default 1.0. set this value if you want to resize the original image by this factor. You DO NOT need to change camera/projection matrix, those will be updated accordingly.

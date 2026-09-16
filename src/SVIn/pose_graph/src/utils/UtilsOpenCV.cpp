@@ -296,7 +296,15 @@ cv::Mat UtilsOpenCV::readRosImage(const sensor_msgs::msg::Image::ConstSharedPtr 
       cv::cvtColor(img_const, converted_img, cv::COLOR_RGB2BGR);
     }
     return converted_img;
+  // 原代码：这里只允许 MONO8/BGR8/RGB8，遇到 ZED bag 中的 bgra8 会报错并保留四通道图像。
+  // } else {
+  //   LOG_IF(ERROR, cv_ptr->encoding != sensor_msgs::image_encodings::MONO8)
+  //       << "Expected image with MONO8, BGR8, or RGB8 encoding."
+  //          "Add in here more conversions if you wish.";
+  //   return img_const;
+  // }
   } else if (img_msg->encoding == sensor_msgs::image_encodings::BGRA8) {
+    // 改进原因：pose_graph 也会读取 SVIn keyframe 图像，需把 bgra8 转成灰度或 BGR，避免四通道图像进入后端。
     if (grayscale) {
       cv::cvtColor(img_const, converted_img, cv::COLOR_BGRA2GRAY);
     } else {
@@ -304,6 +312,7 @@ cv::Mat UtilsOpenCV::readRosImage(const sensor_msgs::msg::Image::ConstSharedPtr 
     }
     return converted_img;
   } else if (img_msg->encoding == sensor_msgs::image_encodings::RGBA8) {
+    // 改进原因：兼容同类四通道 RGBA 图像，输出保持与原函数约定一致的灰度或 BGR。
     if (grayscale) {
       cv::cvtColor(img_const, converted_img, cv::COLOR_RGBA2GRAY);
     } else {

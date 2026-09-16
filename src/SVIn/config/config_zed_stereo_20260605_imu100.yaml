@@ -1,0 +1,145 @@
+%YAML:1.0
+
+# Config file for 20260605 ZED stereo camera + IMU bag
+# Camera calibration: /media/zhuchao/My Book/zy jetson/data/20260610/zed1-camchain.yaml
+# IMU noise calibration: /home/zhuchao/allan_ws/rosbag2_2026_06_15-20_09_09_0.db3/新imu.yaml
+# Previous IMU noise calibration: /media/zhuchao/My Book/zy jetson/data/20260610/imu.yaml
+# T_SC is the ZED TF-derived camera optical frame to sensor/IMU transform used
+# by the current best 20260610 SVIn run.
+# The ZED TF was published as zed_left_camera_frame -> zed_imu_link, where
+# zed_left_camera_frame is the non-optical camera frame. The matrices below
+# include the ROS camera-frame to optical-frame axis conversion. An inverse-T_SC
+# trial on 2026-06-10 diverged badly, so keep this convention until a dedicated
+# camera-IMU calibration replaces the ZED TF.
+
+cameras:
+    # Left camera (cam0)
+    - {T_SC:
+       [-0.0038822442684003,  0.0049095511912416,  0.9999804120522773,  0.0020905547333866,
+        -0.9999637326352790,  0.0075612488767108, -0.0039193025775462,  0.0230539674972315,
+        -0.0075803427831724, -0.9999593610872667,  0.0048800185209269, -0.0000324208687729,
+         0.0, 0.0, 0.0, 1.0],
+       image_dimension: [1920, 1080],
+       distortion_coefficients: [-0.07026106256042766, 0.10677738183178517, 0.0006173585663468088, 0.008569536916038132],
+       distortion_type: radialtangential,
+       focal_length: [1144.3217320583856, 1144.7799195607972],
+       principal_point: [978.3507676611445, 478.2978415612109]}
+
+    # Right camera (cam1)
+    - {T_SC:
+       [ 0.0370559361262264,  0.0034680529863276,  0.9993071751008197,  0.0054784434180820,
+        -0.9992884198016148,  0.0071698422958466,  0.0370303580185307, -0.0951118270731718,
+        -0.0070364516059892, -0.9999682824837275,  0.0037312704078940, -0.0010168303349393,
+         0.0, 0.0, 0.0, 1.0],
+       image_dimension: [1920, 1080],
+       distortion_coefficients: [-0.0460127185562683, 0.06771239420373695, 0.00027933528490127653, 0.005233802380365547],
+       distortion_type: radialtangential,
+       focal_length: [1138.898057785819, 1141.4736502362914],
+       principal_point: [923.5185354753689, 497.4742154304124]}
+
+camera_params:
+    camera_rate: 14
+    sigma_absolute_translation: 0.0
+    sigma_absolute_orientation: 0.0
+    sigma_c_relative_translation: 0.0
+    sigma_c_relative_orientation: 0.0
+
+imu_params:
+    a_max: 176.0
+    g_max: 7.8
+    # Previous sigma_g_c: 0.00017630374332390088
+    sigma_g_c: 0.00011001353825871552
+    # Previous sigma_a_c: 0.0012943427263198248
+    sigma_a_c: 0.0017503490634546263
+    sigma_bg: 0.03
+    sigma_ba: 0.1
+    # Previous sigma_gw_c: 4.8453452642470325e-05
+    sigma_gw_c: 9.332310748254951e-06
+    # Previous sigma_aw_c: 0.00015022616332559084
+    sigma_aw_c: 0.0002495921976055482
+    tau: 3600.0
+    g: 9.807
+    a0: [ 0.0, 0.0, 0.0 ]
+    # 20260605 bag measured IMU rate: 16513 / 165.884579138s ~= 99.55 Hz
+    # Previous 20260610 Allan setting imu_rate: 400
+    # Previous original setting imu_rate: 200
+    imu_rate: 100
+    T_BS:
+        [1.0000, 0.0000, 0.0000, 0.0,
+         0.0000, 1.0000, 0.0000, 0.0,
+         0.0000, 0.0000, 1.0000, 0.0,
+         0.0000, 0.0000, 0.0000, 1.0000]
+
+# Estimator parameters
+numKeyframes: 5
+numImuFrames: 3
+
+# ceres optimization options
+ceres_options:
+    minIterations: 3
+    maxIterations: 10
+    timeLimit: 0.035
+
+# detection
+detection_options:
+    threshold: 30.0
+    octaves: 1
+    maxNoKeypoints: 400
+
+# delay of images [s]
+# Keep this at 0.0 for the current best 20260610 run. A trial with -0.13
+# increased delayed/past-frame drops, so delay compensation should be handled in
+# the replay/synchronization path instead of this estimator timestamp parameter.
+imageDelay: 0.0
+
+# display debug images?
+displayImages: false
+publishDebugImages: false
+
+# use direct driver
+useDriver: false
+
+# publishing options
+publishing_options:
+    publish_rate: 100
+    publishLandmarks: true
+    landmarkQualityThreshold: 1.0e-2
+    maximumLandmarkQuality: 0.05
+    maxPathLength: 20
+    publishImuPropagatedState: false
+    T_Wc_W:
+        [1.0000, 0.0000, 0.0000, 0.0000,
+         0.0000, 1.0000, 0.0000, 0.0000,
+         0.0000, 0.0000, 1.0000, 0.0000,
+         0.0000, 0.0000, 0.0000, 1.0000]
+    trackedBodyFrame: B
+    velocitiesFrame: Wc
+
+isSonarUsed: false
+isDepthUsed: false
+histogramMethod: "NONE"
+resizeFactor: 0.5
+
+loop_closure_params:
+    enable: 1
+    min_correspondences: 20
+    pnp_reprojection_threshold: 25.0
+    pnp_ransac_iterations: 100
+    keyframe_queue: 10
+    max_yaw_diff: 30.0
+    max_position_diff: 6.0
+
+health:
+    enable: 0
+    min_keypoints: 15
+    consecutive_keyframes: 3
+    keyframe_wait_time: 2.0
+    kps_per_quadrant: 1
+
+global_map_params:
+    enable: 1
+    min_landmark_quality: 0.01
+
+output_params:
+  debug: 0
+  output_dir: ~/svin_ws/src/SVIn/pose_graph

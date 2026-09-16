@@ -130,7 +130,11 @@ int main(int argc, char** argv) {
   // subscriber
   okvis::Subscriber subscriber(node, &okvis_estimator, vio_parameters_reader);
 
-  rclcpp::executors::MultiThreadedExecutor executor;
+  // Keep image and IMU callbacks serialized. The OKVIS frontend rejects images
+  // whose timestamps are older than the last added image; with separate stereo
+  // image topics, a multi-threaded executor can deliver cam0/cam1 callbacks out
+  // of timestamp order under heavy rosbag replay load.
+  rclcpp::executors::SingleThreadedExecutor executor;
   executor.add_node(node);
   while (rclcpp::ok()) {
     okvis_estimator.display();

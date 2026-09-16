@@ -104,8 +104,13 @@ class StereoSync : public rclcpp::Node {
     left_cv_ptr = cv_bridge::toCvCopy(left_msg);
     right_cv_ptr = cv_bridge::toCvCopy(right_msg);
 
-    left_img_pub_->publish(*left_cv_ptr->toImageMsg());
-    right_img_pub_->publish(*right_cv_ptr->toImageMsg());
+    auto left_image = *left_cv_ptr->toImageMsg();
+    auto right_image = *right_cv_ptr->toImageMsg();
+    left_image.header = left_header;
+    right_image.header = right_header;
+
+    left_img_pub_->publish(left_image);
+    right_img_pub_->publish(right_image);
 
     previous_stamp_ = stamp;
   }
@@ -128,8 +133,13 @@ class StereoSync : public rclcpp::Node {
       return;
     }
 
-    left_img_pub_->publish(*left_msg);
-    right_img_pub_->publish(*right_msg);
+    auto left_image = *left_msg;
+    auto right_image = *right_msg;
+    left_image.header = left_header;
+    right_image.header = right_header;
+
+    left_img_pub_->publish(left_image);
+    right_img_pub_->publish(right_image);
 
     previous_stamp_ = stamp;
   }
